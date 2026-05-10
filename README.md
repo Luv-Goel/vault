@@ -1,101 +1,34 @@
-﻿# Vault ðŸ”’
+# vault — ARCHIVED 🪦
 
-<div align="center">
+> **This repository has been archived.**
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)]()
-[![Python](https://img.shields.io/badge/python-3.8%2B-brightgreen)](https://python.org)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Dependencies](https://img.shields.io/badge/dependencies-zero-lightgrey)]()
+The functionality previously in `vault` has been consolidated into **[clawkit](https://github.com/Luv-Goel/clawkit)** — the unified DevOps CLI toolkit.
 
-**Code secret scanner â€” find hardcoded credentials, tokens, API keys, and secrets. Zero dependencies.**
+## What Was This?
 
-</div>
+**Secret scanner — detect exposed credentials, keys, tokens in codebases**
 
----
+## Why Archived?
 
-## Features
+Rather than maintaining a dozen tiny single-purpose Python packages, all CLI tooling now lives under the `clawkit` umbrella. This means:
 
-- **20+ regex patterns** â€” AWS keys, GitHub tokens, GitLab tokens, Stripe API keys, Discord tokens, SSH private keys, database URLs, generic secrets
-- **Entropy detection** â€” Shannon entropy scoring to find high-entropy strings that look like secrets
-- **Smart false-positive filtering** â€” Skips test files, example code, known safe patterns
-- **Multi-threaded scanning** â€” Parallel file processing for speed
-- **Multiple output formats** â€” SARIF, JSON, HTML, plain text
-- **CI/CD ready** â€” Exit code on findings for pipeline integration
-- **Zero dependencies** â€” Pure Python 3.8+, stdlib only
+- ✅ One install: `pip install clawkit`
+- ✅ Unified CLI: `clawkit sift`, `clawkit dotenv`, `clawkit mark`, etc.
+- ✅ Shared utilities and consistent interface
+- ✅ Faster development, fewer dependencies to track
 
-## Quick Start
+## Migration
 
 ```bash
-pip install vault-scanner
+# Before (old way)
+pip install vault
 
-# Scan current directory
-vault scan
-
-# Scan specific path
-vault scan /path/to/project
-
-# JSON output (for pipeline integration)
-vault scan . --format json
-
-# SARIF output (for GitHub Code Scanning)
-vault scan . --format sarif
-
-# Full HTML report
-vault report . --output vault-report.html
+# After (new way)  
+pip install clawkit
+clawkit vault --help
 ```
 
-## CLI Reference
+👉 **Head to [clawkit](https://github.com/Luv-Goel/clawkit)** for the active, maintained version.
 
-| Command | Description |
-|---------|-------------|
-| `vault scan [path]` | Scan for hardcoded secrets |
-| `vault report [path]` | Generate HTML scan report |
-
-### Options
-
-| Flag | Description |
-|------|-------------|
-| `--format TYPE` | Output format: text, json, sarif, html (default: text) |
-| `--output FILE` | Write results to file |
-| `--include-tests` | Include test files in scan (excluded by default) |
-| `--entropy-threshold` | Entropy score threshold (default: 4.5) |
-| `--threads N` | Parallel scan threads (default: CPU count) |
-
-## Detection Patterns
-
-| Category | Patterns |
-|----------|----------|
-| Cloud | AWS Access Key, AWS Secret Key, GCP Service Account |
-| SCM | GitHub Token, GitLab Token, GitHub SSH Key |
-| Payment | Stripe Live/Test Key, Stripe Webhook Secret |
-| Communication | Discord Token, Slack Token, Telegram Bot Token |
-| Crypto | Private Key (RSA, ECDSA, Ed25519), PGP Private Key |
-| Database | PostgreSQL/MySQL/MongoDB URLs, Redis URI |
-| Generic | Password= in configs, secret= in URLs, API keys, Bearer tokens |
-
-## How It Works
-
-1. **Pattern matching** â€” Regex scan against 20+ known secret patterns
-2. **Entropy analysis** â€” Shannon entropy on high-risk strings (API keys, tokens)
-3. **False-positive filter** â€” Excludes test fixtures, examples, known safe patterns
-4. **Priority scoring** â€” Ranks findings by risk level (critical, high, medium, low)
-5. **Report generation** â€” Formats findings with file, line, context, and severity
-
-## Architecture
-
-```
-vault/
-â”œâ”€â”€ vault/
-â”‚   â”œâ”€â”€ __init__.py
-â”‚   â”œâ”€â”€ cli.py       # CLI entry point
-â”‚   â”œâ”€â”€ patterns.py  # Secret detection regex patterns
-â”‚   â”œâ”€â”€ scanner.py   # File scanning engine
-â”‚   â”œâ”€â”€ entropy.py   # Shannon entropy calculation
-â”‚   â””â”€â”€ report.py    # Output formatters
-â”œâ”€â”€ pyproject.toml
-â””â”€â”€ README.md
-```
-
-## License
-
-MIT â€” see [LICENSE](LICENSE).
+---
+*Archived on May 10, 2026 — functionality merged into clawkit*
