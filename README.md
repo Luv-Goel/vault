@@ -1,115 +1,101 @@
-# Vault — Code Secret Scanner
+﻿# Vault ðŸ”’
 
 <div align="center">
 
-**Find hardcoded credentials, API keys, tokens, and secrets before they reach production.**
-
-[![CI](https://github.com/Luv-Goel/vault/actions/workflows/ci.yml/badge.svg)](https://github.com/Luv-Goel/vault/actions/workflows/ci.yml)
-[![Python](https://img.shields.io/badge/python-3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12-blue?logo=python)](https://github.com/Luv-Goel/vault)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)]()
+[![Python](https://img.shields.io/badge/python-3.8%2B-brightgreen)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/Luv-Goel/vault?style=social)](https://github.com/Luv-Goel/vault/stargazers)
+[![Dependencies](https://img.shields.io/badge/dependencies-zero-lightgrey)]()
 
-**Zero API keys. Zero dependencies. Pure Python.**
+**Code secret scanner â€” find hardcoded credentials, tokens, API keys, and secrets. Zero dependencies.**
 
 </div>
 
 ---
 
-## Why Vault?
+## Features
 
-Hardcoded secrets are the #1 cause of credential leaks. But existing tools are:
-
-- **Heavy** — trufflehog, gitleaks are Go binaries, slow to install
-- **Cloud-dependent** — some require API keys to run
-- **Over-engineered** — you just need to scan a directory
-
-Vault is a single-file scanner: `pip install vault-secret-scanner && vault scan .`. No setup, no config, no cloud.
+- **20+ regex patterns** â€” AWS keys, GitHub tokens, GitLab tokens, Stripe API keys, Discord tokens, SSH private keys, database URLs, generic secrets
+- **Entropy detection** â€” Shannon entropy scoring to find high-entropy strings that look like secrets
+- **Smart false-positive filtering** â€” Skips test files, example code, known safe patterns
+- **Multi-threaded scanning** â€” Parallel file processing for speed
+- **Multiple output formats** â€” SARIF, JSON, HTML, plain text
+- **CI/CD ready** â€” Exit code on findings for pipeline integration
+- **Zero dependencies** â€” Pure Python 3.8+, stdlib only
 
 ## Quick Start
 
 ```bash
-pip install vault-secret-scanner
+pip install vault-scanner
 
 # Scan current directory
-vault scan .
+vault scan
 
-# Scan with minimum severity
-vault scan ./src --severity high
+# Scan specific path
+vault scan /path/to/project
 
-# Generate HTML report
-vault scan . --format html -o report.html
+# JSON output (for pipeline integration)
+vault scan . --format json
 
-# JSON output for CI pipelines
-vault scan . --format json -o results.json
+# SARIF output (for GitHub Code Scanning)
+vault scan . --format sarif
 
-# SARIF for GitHub Code Scanning
-vault scan . --format sarif -o results.sarif
-
-# List all detection patterns
-vault list-patterns
+# Full HTML report
+vault report . --output vault-report.html
 ```
 
-## What It Finds
+## CLI Reference
 
-### Critical
-- AWS Access Keys & Secret Keys
-- GitHub tokens (personal, fine-grained, OAuth)
-- GitLab personal tokens
-- Stripe API Keys (live & test)
-- Database URLs with credentials (postgres://, mysql://, mongodb://, redis://)
-- RSA/DSA/EC/SSH Private Keys
-- JWT tokens
+| Command | Description |
+|---------|-------------|
+| `vault scan [path]` | Scan for hardcoded secrets |
+| `vault report [path]` | Generate HTML scan report |
 
-### High
-- Google API Keys
-- Slack tokens (bot, app, user)
-- Discord bot tokens
-- npm and PyPI tokens
-- Bearer tokens in code
-- Twilio API Keys
-- Heroku API Keys
+### Options
 
-### Medium
-- Password/hardcoded credential assignments
-- High-entropy strings (Shannon entropy > 4.5)
+| Flag | Description |
+|------|-------------|
+| `--format TYPE` | Output format: text, json, sarif, html (default: text) |
+| `--output FILE` | Write results to file |
+| `--include-tests` | Include test files in scan (excluded by default) |
+| `--entropy-threshold` | Entropy score threshold (default: 4.5) |
+| `--threads N` | Parallel scan threads (default: CPU count) |
 
-## Smart Filtering
+## Detection Patterns
 
-Vault automatically filters out common false positives:
+| Category | Patterns |
+|----------|----------|
+| Cloud | AWS Access Key, AWS Secret Key, GCP Service Account |
+| SCM | GitHub Token, GitLab Token, GitHub SSH Key |
+| Payment | Stripe Live/Test Key, Stripe Webhook Secret |
+| Communication | Discord Token, Slack Token, Telegram Bot Token |
+| Crypto | Private Key (RSA, ECDSA, Ed25519), PGP Private Key |
+| Database | PostgreSQL/MySQL/MongoDB URLs, Redis URI |
+| Generic | Password= in configs, secret= in URLs, API keys, Bearer tokens |
 
-- **UUIDs** — `550e8400-e29b-41d4-a716-446655440000`
-- **Git commit hashes** — `a1b2c3d4e5f6...`
-- **Version strings** — `v1.2.3`, `1.0.0-alpha`
-- **SHA hashes** — cryptographic hashes in code
-- **Test files** — `test_*.py`, `*_test.go`, specs, fixtures
-- **Example code** — lines containing "example", "placeholder", "changeme"
-- **Dependency files** — `package-lock.json`, `yarn.lock`, `Gemfile.lock`
+## How It Works
 
-## Output Formats
+1. **Pattern matching** â€” Regex scan against 20+ known secret patterns
+2. **Entropy analysis** â€” Shannon entropy on high-risk strings (API keys, tokens)
+3. **False-positive filter** â€” Excludes test fixtures, examples, known safe patterns
+4. **Priority scoring** â€” Ranks findings by risk level (critical, high, medium, low)
+5. **Report generation** â€” Formats findings with file, line, context, and severity
 
-| Format | Description | Use Case |
-|--------|-------------|----------|
-| Text | Color-coded severity with context | Terminal scanning |
-| JSON | Structured findings with metadata | CI/CD pipelines |
-| HTML | Dashboard with severity breakdown, searchable | Team reviews |
-| SARIF | GitHub Code Scanning compatible | GitHub Actions |
-
-## Project Structure
+## Architecture
 
 ```
 vault/
-├── vault/
-│   ├── cli.py       # Scan + list-patterns commands
-│   ├── patterns.py  # 20+ regex detection patterns
-│   ├── entropy.py   # Shannon entropy with FP filtering
-│   ├── scanner.py   # File/directory scanning with threading
-│   └── report.py    # Text, JSON, HTML, SARIF formatters
-├── pyproject.toml
-└── README.md
+â”œâ”€â”€ vault/
+â”‚   â”œâ”€â”€ __init__.py
+â”‚   â”œâ”€â”€ cli.py       # CLI entry point
+â”‚   â”œâ”€â”€ patterns.py  # Secret detection regex patterns
+â”‚   â”œâ”€â”€ scanner.py   # File scanning engine
+â”‚   â”œâ”€â”€ entropy.py   # Shannon entropy calculation
+â”‚   â””â”€â”€ report.py    # Output formatters
+â”œâ”€â”€ pyproject.toml
+â””â”€â”€ README.md
 ```
 
-**Pure Python, zero external dependencies.** Works on Python 3.8+.
+## License
 
----
-
-*Built by [ClawWorks Engineering Inc.](https://github.com/Luv-Goel) — 6 projects/day, no excuses.*
+MIT â€” see [LICENSE](LICENSE).
